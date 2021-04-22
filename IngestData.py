@@ -99,8 +99,8 @@ def insert_cities(c_list, cur):
                     c_list[index][2] = None
                 if c_list[index][3] == '':
                     c_list[index][3] = None
-                cur.execute("insert into cities(ckey,name,noc) values (%s,%s,%s)",
-                            (c_list[index][3], c_list[index][2], c_list[index][0]))
+                cur.execute("insert into cities(name,noc) values (%s,%s)",
+                            (c_list[index][2], c_list[index][0]))
         index += 1
 
 
@@ -130,7 +130,7 @@ def insert_events(a_list, cur):
                         "TTName,TTNoc,TTYear) "
                         "values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                         (a_list[index][12], a_list[index][11], a_list[index][0], a_list[index][1], a_list[index][2],
-                         a_list[index][3], a_list[index][4], a_list[index][5], a_list[index][6],a_list[index][7], a_list[index][9]))
+                         a_list[index][3], a_list[index][4], a_list[index][5], a_list[index][6], a_list[index][7], a_list[index][9]))
         index += 1
         serial += 1
     cur.execute("INSERT INTO Events(SportName, EventName) SELECT DISTINCT TSportName, TEventName FROM TEMPEVENTS "
