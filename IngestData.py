@@ -146,11 +146,38 @@ def insert_games(c_list, cur):
         cur.execute("INSERT INTO Tempgames(TYear,TStartDate,TEndDate, TName) values(%s,%s,%s,%s)",
                     (c_list[index][3], c_list[index][4], c_list[index][5], c_list[index][3]+" Summer"))
         index += 1
-        print(index)
+
     cur.execute("INSERT INTO Games(Year, Name , StartDate, EndDate) SELECT DISTINCT TYear,TName, TStartDate , "
                 "TEndDate FROM Tempgames WHERE TName IS NOT NULL AND TStartDate IS NOT NULL AND TEndDate IS NOT NULL;")
     cur.execute("INSERT INTO TEAMS(Name, Noc, Year) SELECT DISTINCT TTName , TTNoc , TTYear FROM TEMPEVENTS WHERE "
                 "TTName IS NOT NULL AND TTNoc IS NOT NULL AND TTYear IS NOT NULL;")
+
+
+def insert_results(a_list, cur):
+    index = 0
+    # cur.execute("SELECT ekey FROM Events;")
+    # ekey_list = cur.fetchall()
+    cur.execute("SELECT Eventname FROM Events")
+    event_list = cur.fetchall()
+
+    for rows in a_list:
+        if a_list[index][13] == "Gold":
+            a_list[index][13] = "G"
+        elif a_list[index][13] == "Silver":
+            a_list[index][13] = "S"
+        elif a_list[index][13] == "Bronze":
+            a_list[index][13] = "B"
+        else:
+            a_list[index][13] = None
+        print("EVENT:"+a_list[index][12])
+        cur.execute("SELECT ekey FROM events WHERE eventname = %s", (a_list[index][12],))
+        eky = cur.fetchall()
+        for e in eky:
+            temp = e[0]
+        cur.execute("INSERT INTO Results (Year , Ekey , AKey , Medal) VALUES (%s,%s,%s,%s)",
+                    (a_list[index][9], temp, a_list[index][0], a_list[index][13]))
+        index += 1
+
 
 
 
@@ -164,6 +191,7 @@ insert_countries(NOCRegions_list, cur)
 insert_cities(HostCities_list, cur)
 insert_events(AthleteEvents_list, cur)
 insert_games(HostCities_list, cur)
+insert_results(AthleteEvents_list, cur)
 
 # commit the changes, this makes the database persistent
 
