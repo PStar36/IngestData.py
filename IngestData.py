@@ -169,7 +169,6 @@ def insert_results(a_list, cur):
             a_list[index][13] = "B"
         else:
             a_list[index][13] = None
-        print("EVENT:"+a_list[index][12])
         cur.execute("SELECT ekey FROM events WHERE eventname = %s", (a_list[index][12],))
         eky = cur.fetchall()
         for e in eky:
@@ -177,6 +176,20 @@ def insert_results(a_list, cur):
         cur.execute("INSERT INTO Results (Year , Ekey , AKey , Medal) VALUES (%s,%s,%s,%s)",
                     (a_list[index][9], temp, a_list[index][0], a_list[index][13]))
         index += 1
+
+def insert_gamesin(h_list, cur):
+    index = 0
+    for rows in h_list:
+        cur.execute("INSERT INTO Tgamesin(year, CName) values (%s,%s)", (h_list[index][3], h_list[index][2]))
+        cur.execute("SELECT ckey FROM cities WHERE name = %s", (h_list[index][2],))
+        ckey = cur.fetchall()
+        for e in ckey:
+             temp = e[0]
+        cur.execute("INSERT INTO GamesIn(year, ckey) VALUES (%s,%s)", (h_list[index][3], temp))
+        index += 1
+
+def insert_teamsathletes()
+
 
 
 
@@ -192,10 +205,11 @@ insert_cities(HostCities_list, cur)
 insert_events(AthleteEvents_list, cur)
 insert_games(HostCities_list, cur)
 insert_results(AthleteEvents_list, cur)
+insert_gamesin(HostCities_list, cur)
 
 # commit the changes, this makes the database persistent
 
-#cur.execute("DROP TABLE IF EXISTS TEMPEVENTS;")
+#cur.execute("DROP TABLE IF EXISTS TEMPEVENTS, TCities , Tgamesin;")
 sql_con.commit()
 
 # close connections

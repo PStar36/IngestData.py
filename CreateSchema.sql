@@ -1,7 +1,7 @@
 
 -- Cleanup existing tables and data
 DROP TABLE IF EXISTS Games, Countries, Cities, GamesIn, 
-  Teams, Athletes, TeamAthletes, Events, Results, TEMPEVENTS, Tempgames,TCities;
+  Teams, Athletes, TeamAthletes, Events, Results, TEMPEVENTS, Tempgames,TCities,gamesin;
 
 -- Create all tables, incl constraints
 CREATE TABLE TEMPEVENTS(
@@ -16,7 +16,7 @@ CREATE TABLE TEMPEVENTS(
   TWeight INT,
   TTName VARCHAR(128),
   TTNoc CHAR(3),
-  TTYear INT,
+  TTYear INT
   );
 create TABLE Tempgames(
   TYear INT,
@@ -37,7 +37,10 @@ CREATE TABLE Countries(
   Population BIGINT,
   Gdp FLOAT
 );
-
+CREATE TABLE Tgamesin(
+    CName VARCHAR,
+    year INT
+);
 CREATE TABLE Cities(
   CKey SERIAL PRIMARY KEY,
   Name VARCHAR(128) UNIQUE NOT NULL,
