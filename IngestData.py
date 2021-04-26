@@ -130,21 +130,26 @@ def insert_events(a_list, cur):
                         "TTName,TTNoc,TTYear) "
                         "values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                         (a_list[index][12], a_list[index][11], a_list[index][0], a_list[index][1], a_list[index][2],
-                         a_list[index][3], a_list[index][4], a_list[index][5], a_list[index][6], a_list[index][7], a_list[index][9]))
+                         a_list[index][3], a_list[index][4], a_list[index][5], a_list[index][6], a_list[index][7],
+                         a_list[index][9]))
         index += 1
         serial += 1
     cur.execute("INSERT INTO Events(SportName, EventName) SELECT DISTINCT TSportName, TEventName FROM TEMPEVENTS "
                 "WHERE TSportName IS NOT NULL AND TEventName IS NOT NULL;")
-    cur.execute("INSERT INTO Athletes( Name,AKey,Gender,DoB,Height,Weight) SELECT DISTINCT  TName, TAKey, TGender,"
+
+    cur.execute("INSERT INTO Athletes(Name,AKey,Gender,DoB,Height,Weight) SELECT DISTINCT TName, TAKey, TGender,"
                 "TDoB,THeight,TWeight FROM "
                 "TEMPEVENTS WHERE TName IS NOT NULL;")
+
+    cur.execute("INSERT INTO TEMPATH(AName, ANOC , AAKey) SELECT DISTINCT TName ,TTNOC ,TAKey FROM TEMPEVENTS WHERE "
+                "TName IS NOT NULL ")
 
 
 def insert_games(c_list, cur):
     index = 0
     for rows in c_list:
         cur.execute("INSERT INTO Tempgames(TYear,TStartDate,TEndDate, TName) values(%s,%s,%s,%s)",
-                    (c_list[index][3], c_list[index][4], c_list[index][5], c_list[index][3]+" Summer"))
+                    (c_list[index][3], c_list[index][4], c_list[index][5], c_list[index][3] + " Summer"))
         index += 1
 
     cur.execute("INSERT INTO Games(Year, Name , StartDate, EndDate) SELECT DISTINCT TYear,TName, TStartDate , "
@@ -155,8 +160,7 @@ def insert_games(c_list, cur):
 
 def insert_results(a_list, cur):
     index = 0
-    # cur.execute("SELECT ekey FROM Events;")
-    # ekey_list = cur.fetchall()
+
     cur.execute("SELECT Eventname FROM Events")
     event_list = cur.fetchall()
 
@@ -177,6 +181,7 @@ def insert_results(a_list, cur):
                     (a_list[index][9], temp, a_list[index][0], a_list[index][13]))
         index += 1
 
+
 def insert_gamesin(h_list, cur):
     index = 0
     for rows in h_list:
@@ -184,15 +189,21 @@ def insert_gamesin(h_list, cur):
         cur.execute("SELECT ckey FROM cities WHERE name = %s", (h_list[index][2],))
         ckey = cur.fetchall()
         for e in ckey:
-             temp = e[0]
+            temp = e[0]
         cur.execute("INSERT INTO GamesIn(year, ckey) VALUES (%s,%s)", (h_list[index][3], temp))
         index += 1
 
-def insert_teamsathletes()
 
+def insert_teamsathletes(a_list):
+    global t_tkey
+    for counter in range(len(a_list)):
+        cur.execute("SELECT Tkey FROM TEAMS WHERE name = %s AND year = %s", (a_list[counter][6], a_list[counter][9]))
+        t_tkey = cur.fetchall()
+        for e in t_tkey:
+            temp = e[0]
 
-
-
+        cur.execute("INSERT INTO TempTeamAthletes (tkey, akey) VALUES (%s,%s)", (temp, a_list[counter][0]))
+    cur.execute("INSERT INTO TeamAthletes(tkey,akey) SELECT DISTINCT Tkey , Akey FROM TempTeamAthletes")
 
 
 # Lists from csvs
@@ -206,10 +217,11 @@ insert_events(AthleteEvents_list, cur)
 insert_games(HostCities_list, cur)
 insert_results(AthleteEvents_list, cur)
 insert_gamesin(HostCities_list, cur)
+insert_teamsathletes(AthleteEvents_list)
 
 # commit the changes, this makes the database persistent
 
-#cur.execute("DROP TABLE IF EXISTS TEMPEVENTS, TCities , Tgamesin;")
+cur.execute("DROP TABLE IF EXISTS tempevents, TCities , Tgamesin, tempath ,TempTeamAthletes , tempgames;")
 sql_con.commit()
 
 # close connections
